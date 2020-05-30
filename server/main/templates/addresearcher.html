@@ -1,0 +1,218 @@
+<!-- add researcher here
+<form method="POST">{% csrf_token %}
+    <input type="text" name="researcher_name">
+    <input type="text" name="experience">
+    <input type="text" name="qualification">
+    <button type="submit">Create</button>
+</form> -->
+{% load static %}
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css?family=Rubik&display=swap" rel="stylesheet">
+</head>
+<style type="text/css">
+  * {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Rubik', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  display: flex;
+  height: 100vh;
+}
+.left-section {
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  -webkit-animation-name: left-section;
+          animation-name: left-section;
+  -webkit-animation-duration: 1s;
+          animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+  -webkit-animation-delay: 1s;
+          animation-delay: 1s;
+}
+.right-section {
+  flex: 1;
+  background: linear-gradient(to right, #f50629 0%, #fd9d08 100%);
+  transition: 1s;
+  background-image: url( {% static "wave.png" %} );
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.header > h1 {
+  margin: 0;
+  color: #3CB371;
+}
+
+.form {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+}
+.form > p {
+  text-align: right;
+}
+.form > p > a {
+  color: #000;
+  font-size: 14px;
+}
+.form-field {
+  height: 46px;
+  padding: 0 16px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-family: 'Rubik', sans-serif;
+  outline: 0;
+  transition: .2s;
+  margin-top: 20px;
+}
+.form-field:focus {
+  border-color: #3CB371;
+}
+.form > button {
+  padding: 12px 10px;
+  border: 0;
+  background: #3CB371;
+  border-radius: 3px;
+  margin-top: 10px;
+  color: #fff;
+  letter-spacing: 1px;
+  font-family: 'Rubik', sans-serif;
+}
+
+.form input[type=text]:hover {
+
+  background-color: #DCDCDC;
+}
+
+.form button:hover {
+
+  background-color: #2E8B57;
+}
+
+.animation {
+  -webkit-animation-name: move;
+          animation-name: move;
+  -webkit-animation-duration: .4s;
+          animation-duration: .4s;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+  -webkit-animation-delay: 2s;
+          animation-delay: 2s;
+}
+ 
+.a1 {
+  -webkit-animation-delay: 2s;
+          animation-delay: 2s;
+}
+
+.a2 {
+  -webkit-animation-delay: 2.2s;
+          animation-delay: 2.2s;
+}
+.a3 {
+  -webkit-animation-delay: 2.3s;
+          animation-delay: 2.3s;
+}
+
+.a4 {
+  -webkit-animation-delay: 2.3s;
+          animation-delay: 2.3s;
+}
+
+
+.a8 {
+  -webkit-animation-delay: 2.5s;
+          animation-delay: 2.5s;
+}
+@keyframes move {
+  0% {
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transform: translateY(-40px);
+            transform: translateY(-40px);
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+@keyframes left-section {
+  0% {
+    opacity: 0;
+    width: 0;
+  }
+  100% {
+    opacity: 1;
+    padding: 20px 40px;
+    width: 440px;
+  }
+}
+ul {
+  list-style-type: none;
+  margin: 0 100px;
+  padding:7px 20px 0px 0px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+li {
+  float: right;
+}
+
+li a {
+  display: block;
+  color:#3CB371 ;
+  text-align: center;
+  padding: 14px 25px;
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+li a:hover {
+  color: #006400;
+  border-bottom: 1px solid #006400;
+}
+
+</style>
+<body>
+  <ul>
+  <li><a href="#about">Tab</a></li>
+  <li><a href="#contact">Tab</a></li>
+  <li><a href="#news">Tab</a></li>
+  <li><a href="#home">Tab</a></li>
+</ul>
+ 
+<div class="container">
+  <div class="left-section">
+    <div class="header">
+      <h1 class="animation a1">ADD RESEARCHER HERE</h1>
+    </div>
+    <div class="form">
+        <form method="POST">{% csrf_token %}
+          <input type="text" class="form-field animation a2" placeholder="Researcher_id" name="researcher_id">
+      <input type="text" class="form-field animation a2" placeholder="Researcher_name" name="researcher_name">
+      <input type="text" class="form-field animation a3" placeholder="Experience" name="experience">
+      <input type="text" class="form-field animation a4" placeholder="Qualification" name="qualification">
+      <input type="text" class="form-field animation a4" placeholder="Username" name="username">
+      <input type="text" class="form-field animation a4" placeholder="Password" name="password">
+      <button type="submit" class="animation a8">Create</button>
+        </form>
+    </div>
+  </div>
+  <div class="right-section"></div>
+</div>
+  
+</body>
+</html>

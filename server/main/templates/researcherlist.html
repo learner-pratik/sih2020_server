@@ -1,0 +1,95 @@
+researcher list here
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<style type="text/css">
+ 	
+#example{
+  	border: 1px solid;
+    margin: 100px 30px 0px 30px;
+    box-shadow: 5px 10px 18px #888888;
+}
+
+th,td{
+	border: 0px !important;
+
+}
+
+th{
+	font-size: 20px;
+}
+
+td{
+	font-size: 18px;
+}
+
+.badge{
+	border-radius: 10px; 
+	padding: 7px;
+	width: 70px;
+
+}
+
+</style>
+<body>
+<div id="example">
+ <table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col" class="d-flex flex-column bd-highlight col-5">Name</th>
+      <th scope="col">Experience</th>
+      <th scope="col">Qualification</th>
+      <!-- <th scope="col">Status</th> -->
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in data %}
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">{{i.researcher_name}}</td>
+      <td>{{i.experience}}</td>
+      <td>{{ i.qualification }}</td>
+    </tr>
+    {% endfor %}
+	<!-- <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 2</td>
+      <td>Task 2</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 3</td>
+      <td>Task 3</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 4</td>
+      <td>Task 4</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>  
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 5</td>
+      <td>Task 5</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 6</td>
+      <td>Task 6</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>   -->
+
+  </tbody>
+</table>
+</div>
+</body>
+</html>
