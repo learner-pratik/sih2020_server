@@ -4,6 +4,12 @@ from .forms import addanimalform,addcameraform,addtaskform,addresearcherform
 from background_task import background
 import time
 import subprocess
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Use a service account
+
 ###########API##############
 # from .models import Snippet
 from .serializers import Task_serializer
@@ -35,7 +41,7 @@ def info(request):
                 flag="r"
             except Researcher.DoesNotExist:
                 try:
-                    data=Forest_employee.objects.get(username=user,password=passw,role="forest_officer")
+                    data=Forest_employee.objects.get(username=user,password=passw)
                     flag="f"
                 except:
                     data = None
@@ -49,7 +55,10 @@ def info(request):
                 return redirect('researcher')
             else:
                 request.session['data']={'forest_name':data.forest_name}
-                request.session['flag']="f"
+                if data.role=='employee':
+                    request.session['flag']="e"
+                else:
+                    request.session['flag']="f"
                 return redirect('forest_employee')
     # return render(request, "next.html", {})
 
@@ -78,6 +87,7 @@ def task(request):
         data=[]
         d=Tasks.objects.filter(task_to=fn)
         s=Tasks.objects.filter(task_from=fn)
+        print(s,d)
         for i in d:
             data.append(i)
         print(data,fn)
@@ -148,6 +158,26 @@ def addanimal(request):
         form = addanimalform(request.POST or None)
         if form.is_valid():
             form.save()
+            #firebase#
+            data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+            jsonData = json.loads(data) #converts to a json structure
+
+            cred = credentials.Certificate(jsonData)
+            firebase_admin.initialize_app(cred)
+            db = firestore.client()
+            print(db,form.cleaned_data['animal_id'])
+            animal = db.collection(u'animals').document(form.cleaned_data['animal_id'])
+            animal.set({
+                u'latitude': 0,
+                u'longitude': 0,
+                u'type':form.cleaned_data['animal_info'],
+            })
+            docs = db.collection(u'animals').stream()
+
+            for doc in docs:
+                print(f'{doc.id} => {doc.to_dict()}')
+            #######
+
             return render(request,"done.html",{})  
     return render(request,"addanimal.html",{})
 
@@ -193,14 +223,14 @@ def fun():
 
 ###############API#################
 class give_task(APIView):
-    def post(self,request,format=None):
+    def post(self,request,format=json):
         print(request.data)
-        # snippets = Tasks.objects.filter(task_to=request.data['id'])
-        # serializer = Task_serializer(snippets, many=True)
+        snippets = Tasks.objects.filter(task_to=request.data['id'])
+        serializer = Task_serializer(snippets, many=True)
         # return render(request,"appdata.html",{'data':serializer.data})
-        # return Response(serializer.data)
+        return Response(serializer.data)
         # print(serializer.data)
-        return Response({"data":[{"id":10},{"id":103}]})
+        # return Response({"data":[{"id":10},{"id":103}]})
 
 class manage_task(APIView):
     # def get(self,request,format=None):
