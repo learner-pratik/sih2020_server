@@ -225,7 +225,7 @@ def fun():
 class give_task(APIView):
     def post(self,request,format=json):
         print(request.data)
-        snippets = Tasks.objects.filter(task_to=request.data['id'])
+        snippets = Tasks.objects.filter(task_to=request.data[0])
         serializer = Task_serializer(snippets, many=True)
         # return render(request,"appdata.html",{'data':serializer.data})
         return Response(serializer.data)
