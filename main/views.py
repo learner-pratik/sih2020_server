@@ -246,7 +246,7 @@ class manage_task(APIView):
         print("posting",serializer)
         if serializer.is_valid():
             print("valid",request.data['task_id'])
-            Tasks.objects.get(task_id=request.data['task_id']).delete()
+            Tasks.objects.get(task_id=request.data['task_id'] and task_to=request.data['task_to']).delete()
             serializer.save()
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
