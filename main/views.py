@@ -242,7 +242,7 @@ class manage_task(APIView):
     #     return Response({'data':['a','b','asd']})
 
     def post(self, request, format=None):
-        print(request.data)
+        print(type(request.data))
         serializer = Task_serializer(data=request.data)
         print("posting",serializer)
         if serializer.is_valid():
