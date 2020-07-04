@@ -244,6 +244,7 @@ class manage_task(APIView):
     def post(self, request, format=None):
         print(type(request.data))
         if type(request.data) is list:
+            print(len(request.data))
             for i in range(len(request.data)):
                 serializer = Task_serializer(data=request.data[i])
                 print("posting",serializer)
@@ -253,7 +254,7 @@ class manage_task(APIView):
                     Tasks.objects.filter(task_id=request.data[i]['task_id'],task_to=request.data[i]['task_from']).update(status='complete')
                     serializer.save()
 
-                    return Response([], status=status.HTTP_201_CREATED)
+            return Response([], status=status.HTTP_201_CREATED)
         else:
             serializer = Task_serializer(data=request.data)
             print("posting",serializer)
@@ -263,7 +264,7 @@ class manage_task(APIView):
                 Tasks.objects.filter(task_id=request.data['task_id'],task_to=request.data['task_from']).update(status='complete')
                 serializer.save()
                 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class manage_login(APIView):
