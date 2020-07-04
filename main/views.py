@@ -243,15 +243,27 @@ class manage_task(APIView):
 
     def post(self, request, format=None):
         print(type(request.data))
-        serializer = Task_serializer(data=request.data)
-        print("posting",serializer)
-        if serializer.is_valid():
-            print("valid",request.data['task_id'])
-            Tasks.objects.get(task_id=request.data['task_id'],task_to=request.data['task_to']).delete()
-            Tasks.objects.filter(task_id=request.data['task_id'],task_to=request.data['task_from']).update(status='complete')
-            serializer.save()
-            
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if type(request.data) is list:
+            for i in range(len(request.data)):
+                serializer = Task_serializer(data=request.data[i])
+                print("posting",serializer)
+                if serializer.is_valid():
+                    print("valid",request.data[i]['task_id'])
+                    Tasks.objects.get(task_id=request.data[i]['task_id'],task_to=request.data[i]['task_to']).delete()
+                    Tasks.objects.filter(task_id=request.data[i]['task_id'],task_to=request.data[i]['task_from']).update(status='complete')
+                    serializer.save()
+
+                    return Response([], status=status.HTTP_201_CREATED)
+        else:
+            serializer = Task_serializer(data=request.data)
+            print("posting",serializer)
+            if serializer.is_valid():
+                print("valid",request.data['task_id'])
+                Tasks.objects.get(task_id=request.data['task_id'],task_to=request.data['task_to']).delete()
+                Tasks.objects.filter(task_id=request.data['task_id'],task_to=request.data['task_from']).update(status='complete')
+                serializer.save()
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class manage_login(APIView):
