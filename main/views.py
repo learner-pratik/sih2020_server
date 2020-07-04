@@ -225,7 +225,7 @@ def fun():
 class give_task(APIView):
     def post(self,request,format=json):
         print(request.data)
-        snippets = Tasks.objects.filter(task_to=request.data[0])
+        snippets = Tasks.objects.filter(task_to=request.data[0],status='assigned')
         serializer = Task_serializer(snippets, many=True)
         # return render(request,"appdata.html",{'data':serializer.data})
         return Response(serializer.data)
@@ -242,6 +242,7 @@ class manage_task(APIView):
     #     return Response({'data':['a','b','asd']})
 
     def post(self, request, format=None):
+        print(request.data)
         serializer = Task_serializer(data=request.data)
         print("posting",serializer)
         if serializer.is_valid():
@@ -262,8 +263,11 @@ class manage_login(APIView):
 
     def post(self,request,format=None):
         print(request.data)
-        d=Forest_employee.objects.get(username=request.data['username'],password=request.data['password'])
-        st=d.empid+'-'+d.name
-        data={"id":st}
-        print("post")
+        try:
+            d=Forest_employee.objects.get(username=request.data['username'],password=request.data['password'])
+            st=d.empid+'-'+d.name
+            data={"id":st}
+            print("post")
+        except Forest_employee.DoesNotExist:
+            data={"id":"-1"}
         return Response(data,status=status.HTTP_201_CREATED)
