@@ -258,15 +258,15 @@ a:hover{
     </style>
 </head>
 <body>
-	<img class="wave" src=url( {% static "wave.png" %} )>
+	<img class="wave" src="{% static 'wave.png' %}">
 	<div class="container">
 		<div class="img">
-			<img src=url( {% static "bg.svg" %} )>
+			<img src="{% static 'bg.svg' %}">
 		</div>
 		<div class="login-content">
 			<form method="post" action="{% url 'info' %}">
                 {% csrf_token %}
-				<img src=url( {% static "avatar.svg" %} )>
+				<img src="{% static 'avatar.svg' %}">
 				<h2 class="title">Welcome</h2>
            		<div class="input-div one">
            		   <div class="i">
