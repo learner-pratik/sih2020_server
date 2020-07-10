@@ -159,25 +159,42 @@ def addanimal(request):
         if form.is_valid():
             form.save()
             #firebase#
-            data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
-            jsonData = json.loads(data) #converts to a json structure
+            if not firebase_admin._apps:
+                data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+                jsonData = json.loads(data) #converts to a json structure
 
-            cred = credentials.Certificate(jsonData)
-            firebase_admin.initialize_app(cred)
+                cred = credentials.Certificate(jsonData)
+                firebase_admin.initialize_app(cred)
             db = firestore.client()
             print(db,form.cleaned_data['animal_id'])
             animal = db.collection(u'animals').document(form.cleaned_data['animal_id'])
             animal.set({
-                u'latitude': 0,
-                u'longitude': 0,
-                u'type':form.cleaned_data['animal_info'],
+                u'latitude': form.cleaned_data['latitude'],
+                u'longitude': form.cleaned_data['longitude'],
             })
+
+            ##animal list##
+            animals_list = db.collection(u'animals_list').document(form.cleaned_data['animal_info'])
+            temp=animals_list.get()
+            if temp.exists:
+                print("yes")
+                sel=temp.to_dict()
+                print(sel['id'])
+                tem=sel['id']
+                tem.append(form.cleaned_data['animal_id'])
+                animals_list.update({'id':tem})
+            else:
+                print("no")
+                animals_list.set({
+                    u'id':[form.cleaned_data['animal_id']]
+                })
+
             docs = db.collection(u'animals').stream()
 
             for doc in docs:
                 print(f'{doc.id} => {doc.to_dict()}')
             #######
-
+            
             return render(request,"done.html",{})  
     return render(request,"addanimal.html",{})
 
