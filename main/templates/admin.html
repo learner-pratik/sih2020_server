@@ -4,3 +4,163 @@ Camera page here
 <button onclick="location.href='{% url 'addcamera' %}'">add camera</button>
 <button onclick="location.href='{% url 'addresearcher' %}'">add researcher</button>
 <button onclick="location.href='{% url 'researcherlist' %}'">researcher list</button>
+
+<!-- I am researcher my name is {{researcher_name}}
+animal gps locations here
+<button onclick="location.href='{% url 'addtask' %}'">add task</button>
+<button onclick="location.href='{% url 'task' %}'">task</button> -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Add live realtime data</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; } 
+    .dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+
+</style>
+</head>
+<body>
+    <div class="dropdown">
+        <button class="dropbtn">Dropdown</button>
+        <div class="dropdown-content">
+          <a href='{% url 'addanimal' %}'>Add Animal</a>
+          <a href='{% url 'addcamera' %}'>Add Camera</a>
+          <a href='{% url 'addresearcher' %}'>Add Researcher</a>
+          <a href='{% url 'researcherlist' %}'>Researcher list</a>
+          <a href='{% url '' %}'>Logout</a>
+        </div>
+      </div>
+<div id="map"></div>
+
+<script>
+    //Access token
+	mapboxgl.accessToken = 'pk.eyJ1Ijoib21rYXIyMSIsImEiOiJjanRxc3hoamcwZDNtNGRxZGNnaXF2ZHU3In0.Ovq0lb6DSdnLkIMMb32UPA';
+
+    //Load MAp
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 0
+    });
+
+    //Dictionary of required animal and their type
+    dict = {"lion":["id_1","id_2"],"tiger":["i_1"]};
+    lat = {"lion":[19.194386,20.194386],"tiger":[21.194386]}
+    lon = {"lion":[72.999199,73.999199],"tiger":[74.999199]}
+
+    //Icon set
+    const images =['https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/585px-Google_Maps_pin.svg.png','https://image.flaticon.com/icons/png/512/37/37134.png'];
+
+    //Defining structure of GeoJSON object of all markers
+    //    "data": {
+    //    "type": "Feature",
+    //    "geometry": {
+    //        "type": "Point",
+    //        "coordinates": [-77.0323, 38.9131]
+    //      },
+    //    "properties": {
+    //        "title": "Mapbox DC",
+    //        "marker-symbol": "monument"
+    //      }
+    //  }
+
+    function marker(id,coordinates){ 
+    this.type = "Feature"; 
+    this.geometry = {"type":"Point","coordinates":coordinates};
+    this.properties = {"title":id};
+    } 
+
+    function loadImage(key,c){
+        return new Promise(resolve => {
+            setTimeout(() => {
+                map.loadImage(images[c], function(error, res) {
+                console.log(key,c)
+                map.addImage(key, res)
+            });
+            resolve("done");
+            }, 2000);
+        });
+    }
+
+    map.on('load',async function() {
+
+        //Marker Initialization
+        var c = 0;
+        for(var key in dict){
+            var s=await loadImage(key,c);
+            console.log(s);
+            c += 1;
+            for(var value in dict[key]){
+                //longitude,latitude
+		        console.log(key,dict[key][value],c,value);	
+                let pin  = new marker(dict[key][value],[lon[key][value],lat[key][value]]); 
+                map.addSource(dict[key][value], { type: 'geojson', data: pin });
+                map.addLayer({
+                'id': dict[key][value],
+                'type': 'symbol',
+                'source': dict[key][value],
+                'layout': {
+                    'icon-image': key,
+                    'icon-size': 0.05
+                    }
+                });
+            }
+        }
+
+        //Location updater fires query and update location every 10 seconds
+        window.setInterval(function() {
+            var c=0
+            for(var key in dict){
+                for(var value in dict[key]){
+                    console.log(value,c)
+                    let p = new marker(dict[key][value],[0.0+value,0.0+c]);
+                    map.getSource(dict[key][value]).setData(p);
+                }
+                c+=1
+            }               
+        }, 10000);
+    });
+</script>
+
+</body>
+</html>

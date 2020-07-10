@@ -25,6 +25,7 @@ def login(request):
     # with open('/home/ravi/python projects/sih2020/server/app/process.sh', 'rb') as file:
     #     script = file.read()
     # rc = subprocess.call(script, shell=True)
+    request.session.flush()
     process = subprocess.Popen(['python', 'manage.py','process_tasks'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return render(request, "login.html", {})
 
