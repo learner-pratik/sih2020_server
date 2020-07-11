@@ -52,7 +52,7 @@ animal gps locations here
 
 </style>
 </head>
-<body>
+<body onload="selanimal(1)">
     <div class="dropdown">
         <button class="dropbtn">Dropdown</button>
         <div class="dropdown-content">
@@ -61,6 +61,11 @@ animal gps locations here
           <a href='{% url 'login' %}'>Logout</a>
         </div>
       </div>
+    <select id="animal" onchange="selanimal(0)" style="z-index: 1;position: relative;">
+        <option value="all">All</option>
+        <option value="tiger">Tiger</option>
+        <option value="lion">Lion</option>
+    </select>
 <div id="map"></div>
 
 <script>
@@ -68,16 +73,23 @@ animal gps locations here
 	mapboxgl.accessToken = 'pk.eyJ1Ijoib21rYXIyMSIsImEiOiJjanRxc3hoamcwZDNtNGRxZGNnaXF2ZHU3In0.Ovq0lb6DSdnLkIMMb32UPA';
 
     //Load MAp
-    var map = new mapboxgl.Map({
+    var main_map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         zoom: 0
     });
 
-    //Dictionary of required animal and their type
-    dict = {"lion":["id_1","id_2"],"tiger":["i_1"]};
-    lat = {"lion":[19.194386,20.194386],"tiger":[21.194386]}
-    lon = {"lion":[72.999199,73.999199],"tiger":[74.999199]}
+    //Main Dictionary of required animal and their type
+    mdict = {"lion":["id_1","id_2","id_3","id_4"],"tiger":["i_1","i_2","i_3","i_4"]};
+    mlat = {"lion":[19.194386,20.194386,21,22],"tiger":[21.194386,22,23,24]}
+    mlon = {"lion":[72.999199,73.999199,74,75],"tiger":[74.999199,75.5,76,77]}
+
+    //Temp Dictionary of required animal and their type
+    dict = {};
+    lat = {}
+    lon = {}
+
+    
 
     //Icon set
     const images =['https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/585px-Google_Maps_pin.svg.png','https://image.flaticon.com/icons/png/512/37/37134.png'];
@@ -101,7 +113,7 @@ animal gps locations here
     this.properties = {"title":id};
     } 
 
-    function loadImage(key,c){
+    function loadImage(key,c,map){
         return new Promise(resolve => {
             setTimeout(() => {
                 map.loadImage(images[c], function(error, res) {
@@ -113,12 +125,17 @@ animal gps locations here
         });
     }
 
-    map.on('load',async function() {
-
+    var timer=false
+    async function showmap() {
+        var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 0
+        });
         //Marker Initialization
         var c = 0;
         for(var key in dict){
-            var s=await loadImage(key,c);
+            var s=await loadImage(key,c,map);
             console.log(s);
             c += 1;
             for(var value in dict[key]){
@@ -137,20 +154,55 @@ animal gps locations here
                 });
             }
         }
-
+        console.log(map.style.sourceCaches);
         //Location updater fires query and update location every 10 seconds
-        window.setInterval(function() {
+        timer=window.setInterval(function() {
             var c=0
             for(var key in dict){
                 for(var value in dict[key]){
-                    console.log(value,c)
+                    console.log(value,c,dict[key][value])
+                    console.log(map.style.sourceCaches);
                     let p = new marker(dict[key][value],[0.0+value,0.0+c]);
                     map.getSource(dict[key][value]).setData(p);
                 }
                 c+=1
             }               
-        }, 10000);
-    });
+        }, 5000);
+    }
+
+    function selanimal(flag){
+        
+        console.log(timer)
+        if(timer)
+        clearInterval(timer)
+        var animal="all"
+        if(!flag){
+            console.log(document.getElementById("animal").value);
+            animal=document.getElementById("animal").value
+        }
+        if (animal!="all")
+        {
+            var tid=mdict[animal]
+            var tlat=mlat[animal]
+            var tlon=mlon[animal]
+            console.log(tid,tlat,tlon)
+            dict={}
+            lat={}
+            lon={}
+            dict[animal]=tid
+            lat[animal]=tlat
+            lon[animal]=tlon
+            console.log(dict)
+        }
+        else{
+            dict=mdict
+            lat=mlat
+            lon=mlon
+            console.log(dict,lat,lon)
+        }
+        showmap();
+    }
+
 </script>
 
 </body>
