@@ -72,6 +72,7 @@ def admin(request):
     x=Animal.objects.all()
     for y in x:
         animals.append(y.animal_info)
+    animals=list(set(animals))
     for atype in animals:
         sdict[atype]=[]
         slat[atype]=[]
@@ -82,7 +83,7 @@ def admin(request):
             slat[atype].append(i.latitude[-1])
             slon[atype].append(i.longitude[-1])
     print(sdict,slat,slon)
-    return render(request,"admin.html",{"sdict":sdict,"slat":slat,"slon":slon})
+    return render(request,"admin.html",{"animals":animals,"sdict":sdict,"slat":slat,"slon":slon})
     
 def researcher(request):
     data=request.session.get('data')
@@ -103,7 +104,7 @@ def researcher(request):
             slat[atype].append(i.latitude[-1])
             slon[atype].append(i.longitude[-1])
     print(sdict,slat,slon)
-    return render(request,"researcher.html",{"sdict":sdict,"slat":slat,"slon":slon})
+    return render(request,"researcher.html",{"animals":animals,"sdict":sdict,"slat":slat,"slon":slon})
 
 def forest_employee(request):
     data=request.session.get('data')
@@ -115,6 +116,7 @@ def forest_employee(request):
     x=Animal.objects.all()
     for y in x:
         animals.append(y.animal_info)
+    animals=list(set(animals))
     for atype in animals:
         sdict[atype]=[]
         slat[atype]=[]
@@ -125,7 +127,7 @@ def forest_employee(request):
             slat[atype].append(i.latitude[-1])
             slon[atype].append(i.longitude[-1])
     print(sdict,slat,slon)
-    return render(request,"forest_employee.html",{"sdict":sdict,"slat":slat,"slon":slon})
+    return render(request,"forest_employee.html",{"animals":animals,"sdict":sdict,"slat":slat,"slon":slon})
     
 def task(request):
     for key, value in request.session.items():

@@ -73,8 +73,9 @@ animal gps locations here
       </div>
       <select id="animal" onchange="selanimal(0)" style="z-index: 1;position: relative;">
         <option value="all">All</option>
-        <option value="tiger">Tiger</option>
-        <option value="lion">Lion</option>
+        {% for i in animals %}
+        <option value={{ i }}>{{ i }}</option>
+        {% endfor %}
     </select>
 <div id="map"></div>
 
