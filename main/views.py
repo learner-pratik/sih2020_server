@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
-from .models import Login,Tasks,Researcher,Forest_employee
+from django.http import JsonResponse
+from .models import Login,Tasks,Researcher,Forest_employee,Animal,Camera
 from .forms import addanimalform,addcameraform,addtaskform,addresearcherform
 from background_task import background
 import time
@@ -64,17 +65,67 @@ def info(request):
     # return render(request, "next.html", {})
 
 def admin(request):
-    return render(request,"admin.html",{})
+    animals=[]
+    sdict={}
+    slat={}
+    slon={}
+    x=Animal.objects.all()
+    for y in x:
+        animals.append(y.animal_info)
+    for atype in animals:
+        sdict[atype]=[]
+        slat[atype]=[]
+        slon[atype]=[]
+        a=Animal.objects.filter(animal_info=atype)
+        for i in a:
+            sdict[atype].append(i.animal_id)
+            slat[atype].append(i.latitude[-1])
+            slon[atype].append(i.longitude[-1])
+    print(sdict,slat,slon)
+    return render(request,"admin.html",{"sdict":sdict,"slat":slat,"slon":slon})
     
 def researcher(request):
     data=request.session.get('data')
     print(data)
-    return render(request,"researcher.html",data)
+    r=Researcher.objects.get(researcher_id=data['researcher_id'])
+    animals=r.animal
+    print(animals)
+    sdict={}
+    slat={}
+    slon={}
+    for atype in animals:
+        sdict[atype]=[]
+        slat[atype]=[]
+        slon[atype]=[]
+        a=Animal.objects.filter(animal_info=atype)
+        for i in a:
+            sdict[atype].append(i.animal_id)
+            slat[atype].append(i.latitude[-1])
+            slon[atype].append(i.longitude[-1])
+    print(sdict,slat,slon)
+    return render(request,"researcher.html",{"sdict":sdict,"slat":slat,"slon":slon})
 
 def forest_employee(request):
     data=request.session.get('data')
     print(data)
-    return render(request,"forest_employee.html",data)
+    animals=[]
+    sdict={}
+    slat={}
+    slon={}
+    x=Animal.objects.all()
+    for y in x:
+        animals.append(y.animal_info)
+    for atype in animals:
+        sdict[atype]=[]
+        slat[atype]=[]
+        slon[atype]=[]
+        a=Animal.objects.filter(animal_info=atype)
+        for i in a:
+            sdict[atype].append(i.animal_id)
+            slat[atype].append(i.latitude[-1])
+            slon[atype].append(i.longitude[-1])
+    print(sdict,slat,slon)
+    return render(request,"forest_employee.html",{"sdict":sdict,"slat":slat,"slon":slon})
     
 def task(request):
     for key, value in request.session.items():
@@ -114,7 +165,8 @@ def addtask(request):
     if request.method == 'POST':
         print(request.POST)
         t=Tasks()
-        t.task_id=request.POST.get("task_id")
+        count=Tasks.objects.count()
+        t.task_id='id_'+(str(count+1))
         t.task_from=request.session.get('data')['researcher_id']
         t.task_info=request.POST.get("task_info")
         t.task_to=request.POST.get("task_to")
@@ -156,71 +208,123 @@ def assigntask(request):
 
 def addanimal(request):
     if request.method == 'POST':
-        form = addanimalform(request.POST or None)
-        if form.is_valid():
-            form.save()
-            #firebase#
-            if not firebase_admin._apps:
-                data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
-                jsonData = json.loads(data) #converts to a json structure
+        print((request.POST['animal_id']))
+        a=Animal()
+        count=Animal.objects.count()
+        # print(count)
+        a.animal_id='id_'+(str(count+1))
+        a.animal_name=request.POST['animal_name']
+        a.animal_info=request.POST['animal_info']
+        a.latitude=[0]
+        a.longitude=[0]
+        a.save()
+        # form = addanimalform(request.POST or None)
+        # if(False):
+        # if form.is_valid():
+        # form.save()
+        #firebase#
+        if not firebase_admin._apps:
+            data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+            jsonData = json.loads(data) #converts to a json structure
 
-                cred = credentials.Certificate(jsonData)
-                firebase_admin.initialize_app(cred)
-            db = firestore.client()
-            print(db,form.cleaned_data['animal_id'])
-            animal = db.collection(u'animals').document(form.cleaned_data['animal_id'])
-            animal.set({
-                u'latitude': form.cleaned_data['latitude'],
-                u'longitude': form.cleaned_data['longitude'],
+            cred = credentials.Certificate(jsonData)
+            firebase_admin.initialize_app(cred)
+        db = firestore.client()
+        print(db,'id_'+(str(count+1)))
+        animal = db.collection(u'animals').document('id_'+(str(count+1)))
+        animal.set({
+            u'latitude': 0,
+            u'longitude': 0,
+        })
+
+        ##animal list##
+        animals_list = db.collection(u'animals_list').document(request.POST['animal_info'])
+        temp=animals_list.get()
+        if temp.exists:
+            print("yes")
+            sel=temp.to_dict()
+            print(sel['id'])
+            tem=sel['id']
+            tem.append('id_'+(str(count+1)))
+            animals_list.update({'id':tem})
+        else:
+            print("no")
+            animals_list.set({
+                u'id':['id_'+(str(count+1))]
             })
 
-            ##animal list##
-            animals_list = db.collection(u'animals_list').document(form.cleaned_data['animal_info'])
-            temp=animals_list.get()
-            if temp.exists:
-                print("yes")
-                sel=temp.to_dict()
-                print(sel['id'])
-                tem=sel['id']
-                tem.append(form.cleaned_data['animal_id'])
-                animals_list.update({'id':tem})
-            else:
-                print("no")
-                animals_list.set({
-                    u'id':[form.cleaned_data['animal_id']]
-                })
+        docs = db.collection(u'animals').stream()
 
-            docs = db.collection(u'animals').stream()
-
-            for doc in docs:
-                print(f'{doc.id} => {doc.to_dict()}')
-            #######
-            
-            return render(request,"done.html",{})  
+        for doc in docs:
+            print(f'{doc.id} => {doc.to_dict()}')
+        #######
+        
+        return render(request,"done.html",{})  
     return render(request,"addanimal.html",{})
 
 def addcamera(request):
     if request.method == 'POST':
-        form = addcameraform(request.POST or None)
-        if form.is_valid():
-            form.save()  
-            return render(request,"done.html",{})
+        # form = addcameraform(request.POST or None)
+        # if form.is_valid():
+        #     form.save()  
+        c=Camera()
+        count=Camera.objects.count()
+        c.camera_id='id_'+(str(count+1))
+        c.latitude=request.POST['latitude']
+        c.longitude=request.POST['longitude']
+        c.status=request.POST['status']
+        c.save()
+        return render(request,"done.html",{})
     return render(request,"addcamera.html",{})
 
 def addresearcher(request):
     if request.method == 'POST':
-        form = addresearcherform(request.POST or None)
-        if form.is_valid():
-            form.save() 
-            return render(request,"done.html",{})
-        else:
-            # form.errors.as_data()
-            print('error',form.errors.as_data())
-    return render(request,"addresearcher.html",{})
+        # print(request.body)
+        # form = addresearcherform(request.POST or None)
+        r=Researcher()
+        count=Researcher.objects.count()
+        r.researcher_id='id_'+(str(count+1))
+        r.researcher_name=request.POST['researcher_name']
+        r.experience=request.POST['experience']
+        r.qualification=request.POST['qualification']
+        r.animal=request.POST['animal'].split(",")
+        r.username=request.POST['username']
+        r.password=request.POST['password']
+        r.save()
+        # if (False):
+            # form.save() 
+        return render(request,"done.html",{})
+        # else:
+        #     # form.errors.as_data()
+        #     print('error',form.errors.as_data())
+    data=Animal.objects.all()
+    al=[]
+    for i in data:
+        al.append(i.animal_info)
+    return render(request,"addresearcher.html",{"animal":al})
 
 def researcherlist(request):
     data=Researcher.objects.all()
     return render(request,"researcherlist.html",{'data':data})
+
+def location(request):
+    print(request.POST['animals'])
+    animals=request.POST['animals'].split(",")
+    sdict={}
+    slat={}
+    slon={}
+    for atype in animals:
+        sdict[atype]=[]
+        slat[atype]=[]
+        slon[atype]=[]
+        a=Animal.objects.filter(animal_info=atype)
+        for i in a:
+            sdict[atype].append(i.animal_id)
+            slat[atype].append(i.latitude[-1])
+            slon[atype].append(i.longitude[-1])
+    print(sdict,slat,slon)
+    return JsonResponse({"sdict":sdict,"slat":slat,"slon":slon})
+    # return HttpResponse({"sdict":sdict,"slat":slat,"slon":slon},content_type="application/json")
 
 @background(schedule=2)
 def back():
@@ -302,3 +406,22 @@ class manage_login(APIView):
         except Forest_employee.DoesNotExist:
             data={"id":"-1"}
         return Response(data,status=status.HTTP_201_CREATED)
+
+# class give_location(APIView):
+#     def post(self,request,format=None):
+#         print(request.POST['animals'])
+#         animals=request.POST['animals']
+#         sdict={}
+#         slat={}
+#         slon={}
+#         for atype in animals:
+#             sdict[atype]=[]
+#             slat[atype]=[]
+#             slon[atype]=[]
+#             a=Animal.objects.filter(animal_info=atype)
+#             for i in a:
+#                 sdict[atype].append(i.animal_id)
+#                 slat[atype].append(i.latitude[-1])
+#                 slon[atype].append(i.longitude[-1])
+#         print(sdict,slat,slon)
+#         return({"sdict":sdict,"slat":slat,"slon":slon})

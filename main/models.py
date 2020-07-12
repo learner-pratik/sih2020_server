@@ -1,5 +1,7 @@
 from django.db import models
 # from django_mysql.models import ListCharField
+# from picklefield.fields import PickledObjectField
+from django.contrib.postgres.fields import ArrayField
 from pygments.lexers import get_all_lexers
 from pygments.styles import get_all_styles
 
@@ -11,8 +13,8 @@ class Animal(models.Model):
     animal_id= models.CharField(max_length=200)
     animal_name= models.CharField(max_length=200)
     animal_info= models.CharField(max_length=500)
-    latitude = models.CharField(max_length=2200)
-    longitude = models.CharField(max_length=2200)
+    latitude = ArrayField(models.FloatField())
+    longitude = ArrayField(models.FloatField())
     def __str__(self):
         return self.animal_name
 
@@ -50,6 +52,7 @@ class Logs(models.Model):
 class Researcher(models.Model):
     researcher_id = models.CharField(max_length=200)
     researcher_name = models.CharField(max_length=200)
+    animal = ArrayField(models.CharField(max_length=200))
     experience = models.CharField(max_length=200)
     qualification = models.CharField(max_length=200)
     username = models.CharField(max_length=200)

@@ -79,9 +79,9 @@ animal gps locations here
     });
 
     //Main Dictionary of required animal and their type
-    mdict = {"lion":["id_1","id_2","id_3","id_4"],"tiger":["i_1","i_2","i_3","i_4"]};
-    mlat = {"lion":[19.194386,20.194386,21,22],"tiger":[21.194386,22,23,24]}
-    mlon = {"lion":[72.999199,73.999199,74,75],"tiger":[74.999199,75.5,76,77]}
+    mdict = {{ sdict|safe }};
+    mlat = {{ slat|safe }}
+    mlon = {{ slon|safe }}
 
     //Temp Dictionary of required animal and their type
     dict = {};
@@ -91,7 +91,7 @@ animal gps locations here
     
 
     //Icon set
-    const images =['https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/585px-Google_Maps_pin.svg.png','https://image.flaticon.com/icons/png/512/37/37134.png'];
+    const images =['https://as1.ftcdn.net/jpg/02/37/17/62/500_F_237176220_yDRBwV4Qqvs0JM7fTmhb2fs39A1LTUSI.jpg'];
 
     //Defining structure of GeoJSON object of all markers
     //    "data": {
@@ -115,12 +115,32 @@ animal gps locations here
     function loadImage(key,c,map){
         return new Promise(resolve => {
             setTimeout(() => {
-                map.loadImage(images[c], function(error, res) {
+                map.loadImage('../static/animals/'+key+'.png', function(error, res) {
                 console.log(key,c)
                 map.addImage(key, res)
             });
             resolve("done");
             }, 2000);
+        });
+    }
+
+    function getlocation(){
+        console.log(Object.keys(dict))
+        $.ajax({
+        type: "POST",
+        url: '{% url 'location' %}',  
+        dataType:'json', 
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+              animals:(["lion","tiger"]).toString()},   /* Passing the text data */
+        success:  function(response){
+               console.log(response);
+               dict=response['sdict']
+               lat=response['slat']
+               lon=response['slon']
+           },
+        error: function(response){
+            console.log(response);
+        }
         });
     }
 
@@ -151,22 +171,24 @@ animal gps locations here
                     'icon-size': 0.05
                     }
                 });
+                // map.removeSource(dict[key][value])
             }
         }
         console.log(map.style.sourceCaches);
         //Location updater fires query and update location every 10 seconds
-        timer=window.setInterval(function() {
+        timer=window.setInterval(async function() {
             var c=0
+            await getlocation()
             for(var key in dict){
                 for(var value in dict[key]){
                     console.log(value,c,dict[key][value])
                     console.log(map.style.sourceCaches);
-                    let p = new marker(dict[key][value],[0.0+value,0.0+c]);
+                    let p = new marker(dict[key][value],[lon[key][value],lat[key][value]]);
                     map.getSource(dict[key][value]).setData(p);
                 }
                 c+=1
             }               
-        }, 5000);
+        },10000);
     }
 
     function selanimal(flag){

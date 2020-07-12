@@ -10,7 +10,7 @@
 <head>
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css?family=Rubik&display=swap" rel="stylesheet">
-</head>
+
 <style type="text/css">
   * {
   box-sizing: border-box;
@@ -186,6 +186,7 @@ li a:hover {
 }
 
 </style>
+</head>
 <body>
   <ul>
   <li><a href="#about">Tab</a></li>
@@ -201,10 +202,17 @@ li a:hover {
     </div>
     <div class="form">
         <form method="POST">{% csrf_token %}
-          <input type="text" class="form-field animation a2" placeholder="Researcher_id" name="researcher_id">
+          <!-- <input type="text" class="form-field animation a2" placeholder="Researcher_id" name="researcher_id"> -->
       <input type="text" class="form-field animation a2" placeholder="Researcher_name" name="researcher_name">
       <input type="text" class="form-field animation a3" placeholder="Experience" name="experience">
       <input type="text" class="form-field animation a4" placeholder="Qualification" name="qualification">
+      <input type="hidden" value="" id="animal" name="animal">
+      <select id="list" onchange="addanimal()">
+        <option>None</option>
+        {% for i in animal%}
+        <option value="{{ i }}">{{ i }}</option>
+        {% endfor %}
+      </select>
       <input type="text" class="form-field animation a4" placeholder="Username" name="username">
       <input type="text" class="form-field animation a4" placeholder="Password" name="password">
       <button type="submit" class="animation a8">Create</button>
@@ -214,5 +222,17 @@ li a:hover {
   <div class="right-section"></div>
 </div>
   
+<script>
+  function addanimal(){
+    var n=document.getElementById('list').value
+    var l=document.getElementById('animal').value
+    if(l.length===0)
+    document.getElementById('animal').value=n
+    else
+    document.getElementById('animal').value=l+","+n
+    console.log(document.getElementById('animal').value)
+  }
+</script>
+
 </body>
 </html>
