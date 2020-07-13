@@ -18,6 +18,7 @@ urlpatterns = [
     path('addresearcher', views.addresearcher, name='addresearcher'),
     path('researcherlist', views.researcherlist, name='researcherlist'),
     path('location',views.location,name='location'),
+    path('geojson',views.geojson,name='geojson'),
     #######API#####
     path('gettask', views.give_task.as_view(), name='appdata'),
     path('apptask', views.manage_task.as_view(), name='appdata'),

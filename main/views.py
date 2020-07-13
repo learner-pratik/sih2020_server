@@ -328,6 +328,12 @@ def location(request):
     return JsonResponse({"sdict":sdict,"slat":slat,"slon":slon})
     # return HttpResponse({"sdict":sdict,"slat":slat,"slon":slon},content_type="application/json")
 
+def geojson(request):
+    data = [{'name': 'Peter', 'email': 'peter@example.org'},
+            {'name': 'Julia', 'email': 'julia@example.org'}]
+
+    return JsonResponse(data, safe=False)
+
 @background(schedule=2)
 def back():
     a=0
