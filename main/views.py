@@ -329,8 +329,8 @@ def location(request):
     # return HttpResponse({"sdict":sdict,"slat":slat,"slon":slon},content_type="application/json")
 
 def geojson(request):
-    data = [{'name': 'Peter', 'email': 'peter@example.org'},
-            {'name': 'Julia', 'email': 'julia@example.org'}]
+    data = open('main/static/Neighbourhoods.geojson').read() #opens the json file and saves the raw contents
+    data = json.loads(data)
 
     return JsonResponse(data, safe=False)
 
