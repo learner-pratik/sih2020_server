@@ -111,7 +111,7 @@ li a:hover {
       <td><span class="badge badge-success" style="">{{i.deadline}}</span></td>
       <td ><span class="badge badge-primary">{{i.status}}</span></td>
       {% if i.status == "incomplete" and flag == 'f'%}
-      <td><select onchange="myvalue(this.value,{{i.task_id}})">
+      <td><select onchange="myvalue(this.value,'{{i.task_id}}')">
         <option>None</option>
         {% for j in workers %}
         <option value={{j.empid}}>{{ j.empid }}-{{j.name}}</option>
