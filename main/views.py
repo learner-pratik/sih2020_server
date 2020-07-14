@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import JsonResponse
-from .models import Login,Tasks,Researcher,Forest_employee,Animal,Camera
+from .models import Login,Tasks,Researcher,Forest_employee,Animal,Camera,Logs
 from .forms import addanimalform,addcameraform,addtaskform,addresearcherform
 from background_task import background
 import time
@@ -445,21 +445,16 @@ class manage_login(APIView):
             data={"id":"-1"}
         return Response(data,status=status.HTTP_201_CREATED)
 
-# class give_location(APIView):
-#     def post(self,request,format=None):
-#         print(request.POST['animals'])
-#         animals=request.POST['animals']
-#         sdict={}
-#         slat={}
-#         slon={}
-#         for atype in animals:
-#             sdict[atype]=[]
-#             slat[atype]=[]
-#             slon[atype]=[]
-#             a=Animal.objects.filter(animal_info=atype)
-#             for i in a:
-#                 sdict[atype].append(i.animal_id)
-#                 slat[atype].append(i.latitude[-1])
-#                 slon[atype].append(i.longitude[-1])
-#         print(sdict,slat,slon)
-#         return({"sdict":sdict,"slat":slat,"slon":slon})
+class alert(APIView):
+    def post(self,request,format=None):
+        # print()
+        x=Logs()
+        x.camera_id=request.data['value']
+        x.action=request.data['type']
+        # x.time=
+        t = time.localtime()
+        current_time = time.strftime("%H:%M:%S", t)
+        print(current_time)
+        x.time=str(current_time)
+        x.save()
+        return Response(status=status.HTTP_201_CREATED)

@@ -24,5 +24,5 @@ urlpatterns = [
     path('gettask', views.give_task.as_view(), name='appdata'),
     path('apptask', views.manage_task.as_view(), name='appdata'),
     path('applogin', views.manage_login.as_view(), name='applogin'),
-    # path('location',views.give_location.as_view(),name='location'),
+    path('alert',views.alert.as_view(),name='alert'),
 ]
