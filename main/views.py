@@ -334,6 +334,36 @@ def geojson(request):
 
     return JsonResponse(data, safe=False)
 
+def editresearcher(request,id="0"):
+    print(id)
+    if request.method == 'POST':
+        d=Researcher.objects.get(researcher_id=id).delete()
+        r=Researcher()
+        r.researcher_id=id
+        r.researcher_name=request.POST['researcher_name']
+        r.experience=request.POST['experience']
+        r.qualification=request.POST['qualification']
+        r.animal=request.POST['animal'].split(",")
+        r.username=request.POST['username']
+        r.password=request.POST['password']
+        r.save()
+        # if (False):
+            # form.save() 
+        return render(request,"done.html",{})
+    r=Researcher.objects.get(researcher_id=id)
+    ra=set(r.animal)
+    data=Animal.objects.all()
+    al=[]
+    for i in data:
+        if i.animal_info not in ra: 
+            al.append(i.animal_info)
+    al=list(set(al))
+    ra=list(ra)
+    resa=ra[0]
+    for i in range(1,len(ra)):
+        resa+=","+ra[i]
+    return render(request,"editresearcher.html",{"r":r,"animal":al,"resa":resa})
+
 @background(schedule=2)
 def back():
     a=0

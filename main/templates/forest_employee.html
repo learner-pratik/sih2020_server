@@ -51,6 +51,7 @@ animal gps locations here
 
 
 </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body onload="selanimal(1)">
     <div class="dropdown">
@@ -66,6 +67,7 @@ animal gps locations here
         <option value={{ i }}>{{ i }}</option>
         {% endfor %}
     </select>
+    <div id="aid" style="z-index: 1;position: relative;"></div>
 <div id="map"></div>
 
 <script>
@@ -129,7 +131,7 @@ animal gps locations here
         console.log(Object.keys(dict))
         $.ajax({
         type: "POST",
-        url: '{% url 'location' %}',  
+        url: "{% url 'location' %}",  
         dataType:'json', 
         data: {csrfmiddlewaretoken: '{{ csrf_token }}',
               animals:(["lion","tiger"]).toString()},   /* Passing the text data */
@@ -204,6 +206,14 @@ animal gps locations here
         }
         if (animal!="all")
         {
+            document.getElementById("aid").innerHTML="<select id='animal_id' onchange='selid("+'"'+animal+'"'+")'>"
+                +"<option value='all'>All</option>"
+                +"</select>"
+            for(var i in mdict[animal])
+            {
+                console.log(mdict[animal][i],i)
+                document.getElementById("animal_id").innerHTML+=("<option value='"+i.toString()+"'>"+mdict[animal][i].toString()+"</option>")
+            }
             var tid=mdict[animal]
             var tlat=mlat[animal]
             var tlon=mlon[animal]
@@ -221,6 +231,41 @@ animal gps locations here
             lat=mlat
             lon=mlon
             console.log(dict,lat,lon)
+        }
+        showmap();
+    }
+
+    function selid(animal){
+        console.log(timer)
+        if(timer)
+        clearInterval(timer)
+        var id=document.getElementById('animal_id').value
+        if(id!='all'){
+            var tid=[mdict[animal][id]]
+            var tlat=[mlat[animal][id]]
+            var tlon=[mlon[animal][id]]
+            console.log(tid,tlat,tlon)
+            dict={}
+            lat={}
+            lon={}
+            dict[animal]=tid
+            lat[animal]=tlat
+            lon[animal]=tlon
+            console.log(dict)
+            console.log(document.getElementById('animal_id').value)
+        }
+        else{
+            var tid=mdict[animal]
+            var tlat=mlat[animal]
+            var tlon=mlon[animal]
+            console.log(tid,tlat,tlon)
+            dict={}
+            lat={}
+            lon={}
+            dict[animal]=tid
+            lat[animal]=tlat
+            lon[animal]=tlon
+            console.log(dict)
         }
         showmap();
     }
