@@ -81,7 +81,8 @@ li a:hover {
     });
   }
   function myvalue(i,j){
-    console.log(i,j);
+    console.log(i);
+    console.log(j);
     document.getElementById(j).value=i;
   }
 </script>
@@ -113,7 +114,7 @@ li a:hover {
       <td><select onchange="myvalue(this.value,{{i.task_id}})">
         <option>None</option>
         {% for j in workers %}
-        <option>{{ j.empid }}-{{j.name}}</option>
+        <option value={{j.empid}}>{{ j.empid }}-{{j.name}}</option>
         {% endfor %}
       </select></td>
       <td><button value="" id="{{i.task_id}}" onclick="send(this.value,{{i.task_id}})">Assign</button></td>
