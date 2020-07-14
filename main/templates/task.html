@@ -117,7 +117,7 @@ li a:hover {
         <option value={{j.empid}}>{{ j.empid }}-{{j.name}}</option>
         {% endfor %}
       </select></td>
-      <td><button value="" id="{{i.task_id}}" onclick="send(this.value,{{i.task_id}})">Assign</button></td>
+      <td><button value="" id="{{i.task_id}}" onclick="send(this.value,'{{i.task_id}}')">Assign</button></td>
       {% else %}
       <td>{{i.task_to}}</td>
       {% endif %}
