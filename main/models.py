@@ -46,6 +46,8 @@ class Logs(models.Model):
     camera_id = models.CharField(max_length=200)
     time = models.CharField(max_length=200)
     action = models.CharField(max_length=200)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     def __str__(self):
         return self.camera_id
 

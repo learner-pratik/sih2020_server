@@ -483,6 +483,8 @@ class alert(APIView):
                 )
             pusher_client.trigger('my-channel', 'my-event', {'message': 'I am a Hunter'})
             x=Logs()
+            x.latitude=request.data['latitude']
+            x.longitude=request.data['longitude']
         x.camera_id=request.data['value']
         x.action=request.data['type']
         # self.count.remove(request.data['value'])
