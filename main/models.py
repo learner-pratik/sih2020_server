@@ -49,6 +49,13 @@ class Logs(models.Model):
     def __str__(self):
         return self.camera_id
 
+class Status(models.Model):
+    camera_id = models.CharField(max_length=200)
+    time = models.CharField(max_length=200)
+    action = models.CharField(max_length=200)
+    def __str__(self):
+        return self.camera_id
+
 class Researcher(models.Model):
     researcher_id = models.CharField(max_length=200)
     researcher_name = models.CharField(max_length=200)

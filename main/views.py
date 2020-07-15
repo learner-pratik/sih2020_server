@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import JsonResponse
-from .models import Login,Tasks,Researcher,Forest_employee,Animal,Camera,Logs
+from .models import Login,Tasks,Researcher,Forest_employee,Animal,Camera,Logs,Status
 from .forms import addanimalform,addcameraform,addtaskform,addresearcherform
 from background_task import background
 import time
@@ -8,6 +8,7 @@ import subprocess
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+import pusher
 
 # Use a service account
 
@@ -22,7 +23,7 @@ import json
 
 def login(request):
     # fun()
-    # back()
+    back()
     # with open('/home/ravi/python projects/sih2020/server/app/process.sh', 'rb') as file:
     #     script = file.read()
     # rc = subprocess.call(script, shell=True)
@@ -367,14 +368,35 @@ def editresearcher(request,id="0"):
 @background(schedule=2)
 def back():
     a=0
+    print("in back new","ravi")
     while(a<10):
         a+=1
         print(a)
-        l=Login()
-        l.username='pratik'
-        l.password='pratik'
-        l.save()
-        time.sleep(3)
+        l=[]
+        c=Camera.objects.all()
+        l=set(l)
+        for i in c:
+            l.add(str(i.camera_id))
+        s=[]
+        temp=Status.objects.all()
+        s=set(s)
+        for i in temp:
+            s.add(str(i.camera_id))
+        ans=l-s
+        if (len(ans)!=0):
+            xyz=list(ans)
+            for i in xyz:
+                pusher_client = pusher.Pusher(
+                app_id='1038724',
+                key='ed4d3bfd7a2e6650c539',
+                secret='d87ae9e5262f74360a37',
+                cluster='ap2',
+                ssl=True
+                )
+                pusher_client.trigger('my-channel', 'my-event', {'message': i})
+        
+        d=Status.objects.all().delete()
+        time.sleep(30)
 
 
 def fun():
@@ -446,15 +468,34 @@ class manage_login(APIView):
         return Response(data,status=status.HTTP_201_CREATED)
 
 class alert(APIView):
+    # count=set([])
     def post(self,request,format=None):
-        # print()
-        x=Logs()
+        # print(self.count)
+        if(request.data['type']=="working"):
+            x=Status()
+        else:
+            pusher_client = pusher.Pusher(
+                app_id='1038724',
+                key='ed4d3bfd7a2e6650c539',
+                secret='d87ae9e5262f74360a37',
+                cluster='ap2',
+                ssl=True
+                )
+            pusher_client.trigger('my-channel', 'my-event', {'message': 'I am a Hunter'})
+            x=Logs()
         x.camera_id=request.data['value']
         x.action=request.data['type']
+        # self.count.remove(request.data['value'])
         # x.time=
         t = time.localtime()
         current_time = time.strftime("%H:%M:%S", t)
         print(current_time)
         x.time=str(current_time)
         x.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+class backtask(APIView):
+    def post(self,request,format=None):
+        back()
+        process = subprocess.Popen(['python', 'manage.py','process_tasks'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return Response(status=status.HTTP_201_CREATED)

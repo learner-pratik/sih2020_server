@@ -25,4 +25,5 @@ urlpatterns = [
     path('apptask', views.manage_task.as_view(), name='appdata'),
     path('applogin', views.manage_login.as_view(), name='applogin'),
     path('alert',views.alert.as_view(),name='alert'),
+    path('backtask',views.backtask.as_view(),name='backtask'),
 ]
