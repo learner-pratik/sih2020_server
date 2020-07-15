@@ -23,7 +23,7 @@ import json
 
 def login(request):
     # fun()
-    back()
+    # back()
     # with open('/home/ravi/python projects/sih2020/server/app/process.sh', 'rb') as file:
     #     script = file.read()
     # rc = subprocess.call(script, shell=True)
