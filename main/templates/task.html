@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,30 +10,39 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 <style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+  body{
+  background-image: url( {% static "wave.png" %} );
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  }
  	
 #example{
-  	border: 1px solid;
     margin: 100px 30px 0px 30px;
     box-shadow: 5px 10px 18px #888888;
+	border-radius:20px;
 }
 
 th,td{
 	border: 0px !important;
-
 }
 
 th{
 	font-size: 20px;
+	font-family: 'Abril Fatface', cursive;
+	color: #218c74;
 }
 
 td{
 	font-size: 18px;
+  border-radius: 20px;
 }
 
 .badge{
 	border-radius: 10px; 
 	padding: 7px;
-	width: 110px;
+	width: auto;
 
 }
 
@@ -41,7 +51,7 @@ ul {
   margin: 0 100px;
   padding:7px 20px 0px 0px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: transparent;
 }
 
 li {
@@ -59,9 +69,9 @@ li a {
 
 li a:hover {
   color: #006400;
-  border-bottom: 1px solid #006400;
-  text-decoration: none;
+  border-bottom: 0px solid #006400;
 }
+	
 
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -94,8 +104,8 @@ li a:hover {
     <li><a href="#news">Tab</a></li>
     <li><a href='{% url 'login' %}'>Logout</a></li>
   </ul>
-<div id="example">
- <table class="table table-bordered">
+  <div id="example" style="background-color: white;">
+ <table class="table">
   <thead>
     <tr>
       <th scope="col" class="d-flex flex-column bd-highlight col-5">Task Info</th>
