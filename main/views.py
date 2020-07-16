@@ -85,11 +85,11 @@ def admin(request):
         ##x>=0.5 red,0.5>x>=0.2 yellow,x<0.2 green
     for i in range(len(val)):
         if val[i]>=0.5:
-            data['features'][i]['properties']["X"]='r'
+            data['features'][i]['properties']["X"]=1
         elif val[i]<0.5 and val[i]>=0.2:
-            data['features'][i]['properties']["X"]='y'
+            data['features'][i]['properties']["X"]=2
         else:
-            data['features'][i]['properties']["X"]='g'
+            data['features'][i]['properties']["X"]=3
     # data['features']=sorted(data['features'], key=lambda k: k['properties'].get("AREA_SHORT_CODE",0))
     with open('main/static/Neighbourhoods.geojson', "w") as outfile: 
         json.dump(data, outfile) 
