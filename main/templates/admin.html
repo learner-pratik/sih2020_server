@@ -31,7 +31,7 @@ animal gps locations here
 .dropdown {
   position: relative;
   display: inline-block;
-  z-index: 1;
+  z-index: 2;
 }
 
 .dropdown-content {
@@ -67,6 +67,7 @@ animal gps locations here
           <a href='{% url 'addanimal' %}'>Add Animal</a>
           <a href='{% url 'addcamera' %}'>Add Camera</a>
           <a href='{% url 'addresearcher' %}'>Add Researcher</a>
+          <a href='{% url 'addforest_employee' %}'>Add Forest Employee</a>
           <a href='{% url 'researcherlist' %}'>Researcher list</a>
           <a href='{% url 'login' %}'>Logout</a>
         </div>

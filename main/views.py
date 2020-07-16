@@ -332,7 +332,23 @@ def addresearcher(request):
     al=[]
     for i in data:
         al.append(i.animal_info)
+    al=list(set(al))
     return render(request,"addresearcher.html",{"animal":al})
+
+def addforest_employee(request):
+    if request.method == 'POST':
+        temp=Forest_employee()
+        count=Forest_employee.objects.count()
+        temp.empid='id_'+(str(count+1))
+        temp.name=request.POST['name']
+        temp.forest_name=request.POST['forest_name']
+        temp.role=request.POST['role']
+        temp.username=request.POST['username']
+        temp.password=request.POST['password']
+        temp.save()
+        return render(request,"done.html",{})
+
+    return render(request,"addforest_employee.html",{})
 
 def researcherlist(request):
     data=Researcher.objects.all()

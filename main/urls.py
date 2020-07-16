@@ -16,6 +16,7 @@ urlpatterns = [
     path('addanimal', views.addanimal, name='addanimal'),
     path('addcamera', views.addcamera, name='addcamera'),
     path('addresearcher', views.addresearcher, name='addresearcher'),
+    path('addforest_employee', views.addforest_employee, name='addforest_employee'),
     path('researcherlist', views.researcherlist, name='researcherlist'),
     path('location',views.location,name='location'),
     path('geojson',views.geojson,name='geojson'),
