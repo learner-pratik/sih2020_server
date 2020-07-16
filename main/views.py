@@ -9,6 +9,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import pusher
+from tensorflow import keras
+import numpy as np
 
 # Use a service account
 
@@ -48,10 +50,11 @@ def info(request):
                     flag="f"
                 except:
                     data = None
+                    flag = None
             # data=Researcher.objects.get(username=user,password=passw)
             print(data,flag)
             if data==None:
-                return render(request, "login.html", {})
+                return redirect('login')
             if flag=="r":
                 request.session['data']={'researcher_id':data.researcher_id}
                 request.session['flag']="r"
@@ -66,6 +69,31 @@ def info(request):
     # return render(request, "next.html", {})
 
 def admin(request):
+    ##ml model
+    model=keras.models.load_model('main/static/hood_2')
+    test=np.array([2020,197]).reshape(1,2)
+    pred=model.predict(test)
+    val=[]
+    with open('main/static/Neighbourhoods.geojson', 'r') as openfile: 
+  
+    # Reading from json file 
+        data = json.load(openfile) 
+    # print(pred)
+    for i in pred:
+        # print(i)
+        val=i
+        ##x>=0.5 red,0.5>x>=0.2 yellow,x<0.2 green
+    for i in range(len(val)):
+        if val[i]>=0.5:
+            data['features'][i]['properties']["X"]='r'
+        elif val[i]<0.5 and val[i]>=0.2:
+            data['features'][i]['properties']["X"]='y'
+        else:
+            data['features'][i]['properties']["X"]='g'
+    # data['features']=sorted(data['features'], key=lambda k: k['properties'].get("AREA_SHORT_CODE",0))
+    with open('main/static/Neighbourhoods.geojson', "w") as outfile: 
+        json.dump(data, outfile) 
+
     animals=[]
     sdict={}
     slat={}
@@ -332,7 +360,7 @@ def location(request):
 def geojson(request):
     data = open('main/static/Neighbourhoods.geojson').read() #opens the json file and saves the raw contents
     data = json.loads(data)
-
+    # data['features']=sorted(data['features'], key=lambda k: k['properties'].get("AREA_SHORT_CODE",0))
     return JsonResponse(data, safe=False)
 
 def editresearcher(request,id="0"):
