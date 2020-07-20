@@ -411,6 +411,13 @@ def editresearcher(request,id="0"):
 
 @background(schedule=2)
 def back():
+    if not firebase_admin._apps:
+        data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+        jsonData = json.loads(data) #converts to a json structure
+
+        cred = credentials.Certificate(jsonData)
+        firebase_admin.initialize_app(cred)
+    db = firestore.client()
     a=0
     print("in back new","ravi")
     while(a<10):
@@ -430,6 +437,11 @@ def back():
         if (len(ans)!=0):
             xyz=list(ans)
             for i in xyz:
+                c = db.collection(u'camera').document('status')
+                c.set({
+                    u'camera_id': i,
+                })
+
                 pusher_client = pusher.Pusher(
                 app_id='1038724',
                 key='ed4d3bfd7a2e6650c539',
