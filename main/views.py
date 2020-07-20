@@ -420,39 +420,39 @@ def back():
     db = firestore.client()
     a=0
     print("in back new","ravi")
-    while(a<10):
-        a+=1
-        print(a)
-        l=[]
-        c=Camera.objects.all()
-        l=set(l)
-        for i in c:
-            l.add(str(i.camera_id))
-        s=[]
-        temp=Status.objects.all()
-        s=set(s)
-        for i in temp:
-            s.add(str(i.camera_id))
-        ans=l-s
-        if (len(ans)!=0):
-            xyz=list(ans)
-            for i in xyz:
-                c = db.collection(u'camera').document('status')
-                c.set({
-                    u'camera_id': i,
-                })
+    # while(a<10):
+    a+=1
+    print(a)
+    l=[]
+    c=Camera.objects.all()
+    l=set(l)
+    for i in c:
+        l.add(str(i.camera_id))
+    s=[]
+    temp=Status.objects.all()
+    s=set(s)
+    for i in temp:
+        s.add(str(i.camera_id))
+    ans=l-s
+    if (len(ans)!=0):
+        xyz=list(ans)
+        for i in xyz:
+            c = db.collection(u'camera').document('status')
+            c.set({
+                u'camera_id': i,
+            })
 
-                pusher_client = pusher.Pusher(
-                app_id='1038724',
-                key='ed4d3bfd7a2e6650c539',
-                secret='d87ae9e5262f74360a37',
-                cluster='ap2',
-                ssl=True
-                )
-                pusher_client.trigger('my-channel', 'my-event', {'message': i})
-        
-        d=Status.objects.all().delete()
-        time.sleep(30)
+            pusher_client = pusher.Pusher(
+            app_id='1038724',
+            key='ed4d3bfd7a2e6650c539',
+            secret='d87ae9e5262f74360a37',
+            cluster='ap2',
+            ssl=True
+            )
+            pusher_client.trigger('my-channel', 'my-event', {'message': i})
+    
+    d=Status.objects.all().delete()
+    # time.sleep(30)
 
 
 def fun():
@@ -554,6 +554,6 @@ class alert(APIView):
 
 class backtask(APIView):
     def post(self,request,format=None):
-        back()
+        back(repeat=5)
         process = subprocess.Popen(['python', 'manage.py','process_tasks'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return Response(status=status.HTTP_201_CREATED)
