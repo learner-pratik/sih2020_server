@@ -554,6 +554,6 @@ class alert(APIView):
 
 class backtask(APIView):
     def post(self,request,format=None):
-        back(repeat=5)
+        back(repeat=5,repeat_until=datetime.datetime.now()+datetime.timedelta(0,600))
         process = subprocess.Popen(['python', 'manage.py','process_tasks'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return Response(status=status.HTTP_201_CREATED)
