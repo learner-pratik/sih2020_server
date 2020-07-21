@@ -425,10 +425,14 @@ def back():
     a+=1
     print(a)
     l=[]
+    lon={}
+    lat={}
     c=Camera.objects.all()
     l=set(l)
     for i in c:
         l.add(str(i.camera_id))
+        lon[str(i.camera_id)]=i.longitude
+        lat[str(i.camera_id)]=i.latitude
     s=[]
     temp=Status.objects.all()
     s=set(s)
@@ -441,6 +445,8 @@ def back():
             c = db.collection(u'camera').document('status')
             c.set({
                 u'camera_id': i,
+                u'latitude': lat[i],
+                u'longitude': lon[i]
             })
 
             pusher_client = pusher.Pusher(
