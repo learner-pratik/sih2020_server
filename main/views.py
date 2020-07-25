@@ -263,10 +263,34 @@ def addanimal(request):
             firebase_admin.initialize_app(cred)
         db = firestore.client()
         print(db,'id_'+(str(count+1)))
+
+        map_alert=db.collection(u'map_alert').document('animal')
+        tem=map_alert.get()
+        if tem.exists:
+            an=tem.to_dict()
+            if request.POST['animal_info'] in an:
+                an[request.POST['animal_info']].append('id_'+(str(count+1)))
+            else:
+                an[request.POST['animal_info']]=['id_'+(str(count+1))]
+            map_alert.update(an)
+            
+        an_loc=db.collection(u'map_alert').document('location')
+        tem=an_loc.get()
+        if tem.exists:
+            lo=tem.to_dict()
+            lo['id_'+(str(count+1))]=[0,0]
+            an_loc.update(lo)
+
         animal = db.collection(u'animals').document('id_'+(str(count+1)))
         animal.set({
             u'latitude': 0,
             u'longitude': 0,
+        })
+
+        animal = db.collection(u'animals_update').document('new')
+        animal.set({
+            u'animal_id': 'id_'+(str(count+1)),
+            u'animal_type': request.POST['animal_info'],
         })
 
         ##animal list##
@@ -457,6 +481,11 @@ def back():
             ssl=True
             )
             pusher_client.trigger('my-channel', 'my-event', {'message': i})
+    else:
+        c = db.collection(u'camera').document('status')
+        c.set({
+            
+        })
     
     d=Status.objects.all().delete()
     # time.sleep(30)
@@ -534,9 +563,17 @@ class alert(APIView):
     # count=set([])
     def post(self,request,format=None):
         # print(self.count)
+        if not firebase_admin._apps:
+            data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+            jsonData = json.loads(data) #converts to a json structure
+
+            cred = credentials.Certificate(jsonData)
+            firebase_admin.initialize_app(cred)
+        db = firestore.client()
+
         if(request.data['type']=="working"):
             x=Status()
-        else:
+        elif (request.data['type']=="hunter"):
             pusher_client = pusher.Pusher(
                 app_id='1038724',
                 key='ed4d3bfd7a2e6650c539',
@@ -544,10 +581,22 @@ class alert(APIView):
                 cluster='ap2',
                 ssl=True
                 )
-            pusher_client.trigger('my-channel', 'my-event', {'message': 'I am a Hunter'})
+            pusher_client.trigger('my-channel', 'my-event', {'message': 'Hunter detected'})
             x=Logs()
             x.latitude=request.data['latitude']
             x.longitude=request.data['longitude']
+
+            c = db.collection(u'camera').document('hunter')
+            c.set({
+                u'camera_id': request.data['value'],
+                u'latitude': request.data['latitude'],
+                u'longitude': request.data['longitude']
+            })
+            time.sleep(5)
+            c.set({
+                
+            })
+
         x.camera_id=request.data['value']
         x.action=request.data['type']
         # self.count.remove(request.data['value'])
