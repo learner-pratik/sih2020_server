@@ -460,7 +460,7 @@ def back():
     s=[]
     temp=Status.objects.all()
     s=set(s)
-    now = datetime.now()
+    now = datetime.datetime.now()
     for i in temp:
         s.add(str(i.camera_id))
     ans=l-s
@@ -565,7 +565,7 @@ class alert(APIView):
     # count=set([])
     def post(self,request,format=None):
         # print(self.count)
-        now = datetime.now()
+        now = datetime.datetime.now()
         if not firebase_admin._apps:
             data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
             jsonData = json.loads(data) #converts to a json structure
@@ -586,8 +586,8 @@ class alert(APIView):
                 )
             pusher_client.trigger('my-channel', 'my-event', {'message': 'Hunter detected'})
             x=Logs()
-            x.latitude=request.data['latitude']
-            x.longitude=request.data['longitude']
+            x.latitude=float(request.data['latitude'])
+            x.longitude=float(request.data['longitude'])
 
             c = db.collection(u'camera').document('hunter')
             c.set({
