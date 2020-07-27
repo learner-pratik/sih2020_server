@@ -24,7 +24,9 @@ animal gps locations here
 .dropdown {
   position: relative;
   display: inline-block;
-  z-index: 1;
+  float: left;
+  z-index: 3;
+  overflow: visible;
 }
 
 .dropdown-content {
@@ -33,7 +35,7 @@ animal gps locations here
   background-color: #f1f1f1;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  z-index: 3;
 }
 
 .dropdown-content a {
@@ -49,19 +51,52 @@ animal gps locations here
 
 .dropdown:hover .dropbtn {background-color: #3e8e41;}
 
+ul {
+  list-style-type: none;
+  padding:7px 20px 0px 0px;
+  overflow: visible;
+  background-color: #fff;
+  z-index:2;
+  position: relative;
+  margin-top: 0;
+  height: 55px;
+}
+
+li {
+  float: right;
+  z-index: 2;
+  position: relative;
+}
+
+li a {
+  display: block;
+  color:#3CB371 ;
+  text-align: center;
+  padding: 14px 25px;
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+li a:hover {
+  color: #006400;
+  border-bottom: 0px solid #006400;
+}
 
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body onload="selanimal(1)">
-    <div class="dropdown">
-        <button class="dropbtn">Dropdown</button>
-        <div class="dropdown-content">
-          <a href='{% url 'task' %}'>Task</a>
-          <a href='{% url 'addtask' %}'>Add Task</a>
-          <a href='{% url 'login' %}'>Logout</a>
+    <ul>
+        <div class="dropdown">
+            <button class="dropbtn">Dropdown</button>
+            <div class="dropdown-content">
+              <a href='{% url 'task' %}'>Task</a>
+              <a href='{% url 'addtask' %}'>Add Task</a>
+              <a href='{% url 'login' %}'>Logout</a>
+            </div>
         </div>
-      </div>
+        <li><a href='{% url 'login' %}'>Logout</a></li>
+    </ul>
     <select id="animal" onchange="selanimal(0)" style="z-index: 1;position: relative;">
         <option value="all">All</option>
         {% for i in animals %}

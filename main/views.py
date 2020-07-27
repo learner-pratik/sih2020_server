@@ -202,7 +202,7 @@ def addtask(request):
         t.task_from=request.session.get('data')['researcher_id']
         t.task_info=request.POST.get("task_info")
         t.task_to=request.POST.get("task_to")
-        t.status=request.POST.get("status")
+        t.status='incomplete'
         t.deadline=request.POST.get("deadline")
         print(t)
         t.save()
@@ -460,6 +460,7 @@ def back():
     s=[]
     temp=Status.objects.all()
     s=set(s)
+    now = datetime.now()
     for i in temp:
         s.add(str(i.camera_id))
     ans=l-s
@@ -470,7 +471,8 @@ def back():
             c.set({
                 u'camera_id': i,
                 u'latitude': lat[i],
-                u'longitude': lon[i]
+                u'longitude': lon[i],
+                u'time': str(now)
             })
 
             pusher_client = pusher.Pusher(
@@ -563,6 +565,7 @@ class alert(APIView):
     # count=set([])
     def post(self,request,format=None):
         # print(self.count)
+        now = datetime.now()
         if not firebase_admin._apps:
             data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
             jsonData = json.loads(data) #converts to a json structure
@@ -590,7 +593,8 @@ class alert(APIView):
             c.set({
                 u'camera_id': request.data['value'],
                 u'latitude': request.data['latitude'],
-                u'longitude': request.data['longitude']
+                u'longitude': request.data['longitude'],
+                u'time' : str(now)
             })
             time.sleep(5)
             c.set({
@@ -601,10 +605,7 @@ class alert(APIView):
         x.action=request.data['type']
         # self.count.remove(request.data['value'])
         # x.time=
-        t = time.localtime()
-        current_time = time.strftime("%H:%M:%S", t)
-        print(current_time)
-        x.time=str(current_time)
+        x.time=str(now)
         x.save()
         return Response(status=status.HTTP_201_CREATED)
 
