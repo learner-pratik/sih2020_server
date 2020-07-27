@@ -451,6 +451,7 @@ def back():
     l=[]
     lon={}
     lat={}
+    time={}
     c=Camera.objects.all()
     l=set(l)
     for i in c:
@@ -462,6 +463,7 @@ def back():
     s=set(s)
     now = datetime.datetime.now()
     for i in temp:
+        time[str(i.camera_id)]=i.time
         s.add(str(i.camera_id))
     ans=l-s
     if (len(ans)!=0):
@@ -472,7 +474,7 @@ def back():
                 u'camera_id': i,
                 u'latitude': lat[i],
                 u'longitude': lon[i],
-                u'time': str(now)
+                u'time': time[i]
             })
 
             pusher_client = pusher.Pusher(
@@ -594,7 +596,7 @@ class alert(APIView):
                 u'camera_id': request.data['value'],
                 u'latitude': request.data['latitude'],
                 u'longitude': request.data['longitude'],
-                u'time' : str(now)
+                u'time' : request.data['timestamp']
             })
             time.sleep(5)
             c.set({
@@ -605,7 +607,7 @@ class alert(APIView):
         x.action=request.data['type']
         # self.count.remove(request.data['value'])
         # x.time=
-        x.time=str(now)
+        x.time=str(request.data['timestamp'])
         x.save()
         return Response(status=status.HTTP_201_CREATED)
 
