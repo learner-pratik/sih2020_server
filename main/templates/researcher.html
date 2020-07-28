@@ -14,17 +14,20 @@ animal gps locations here
 	body { margin: 0; padding: 0; }
 	#map { position: absolute; top: 0; bottom: 0; width: 100%; } 
     .dropbtn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
+    color: #3CB371;
+    padding: 14px;
+    font-size: 20px;
+    border-color: #3CB371;
+    border-width: medium;
+    border-radius: 7px;
+    background: #fff;
 }
 
 .dropdown {
-  position: relative;
+  position: absolute;
   display: inline-block;
-  float: left;
+  /* float: left; */
+  margin-left: 10px;
   z-index: 3;
   overflow: visible;
 }
@@ -32,7 +35,7 @@ animal gps locations here
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f1f1f1;
+  background-color: #8bf8bc;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 3;
@@ -43,13 +46,14 @@ animal gps locations here
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  font-size: 20px;
 }
 
-.dropdown-content a:hover {background-color: #ddd;}
+.dropdown-content a:hover {background-color: #3e8e41;color: #fff;}
 
 .dropdown:hover .dropdown-content {display: block;}
 
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
+.dropdown:hover .dropbtn {background-color: #3e8e41;color: white;}
 
 ul {
   list-style-type: none;
@@ -59,7 +63,7 @@ ul {
   z-index:2;
   position: relative;
   margin-top: 0;
-  height: 55px;
+  height: 63px;
 }
 
 li {
@@ -69,17 +73,45 @@ li {
 }
 
 li a {
-  display: block;
-  color:#3CB371 ;
-  text-align: center;
-  padding: 14px 25px;
-  text-decoration: none;
-  letter-spacing: 2px;
+    display: block;
+    color: #3CB371;
+    text-align: center;
+    padding: 14px 25px;
+    text-decoration: none;
+    letter-spacing: 2px;
+    font-size: 20px;
+    
 }
 
 li a:hover {
   color: #006400;
-  border-bottom: 0px solid #006400;
+  /* border-bottom: 0px solid #006400; */
+}
+
+select{
+    z-index: 1;
+    position: relative;
+    padding: 12px;
+    /* border: 0; */
+    border-radius: 7px;
+    letter-spacing: 1px;
+    font-size: 20px;
+    color: #3CB371;
+    background: #fff;
+    border-width: medium;
+    border-color: #3CB371;
+    outline: none;
+}
+option{
+    font-size: 20px;
+    color: black;
+    background: #8bf8bc;
+}
+
+p{
+    position: relative;
+    font-size: 25px;
+    margin:0px;
 }
 
 </style>
@@ -95,15 +127,21 @@ li a:hover {
               <a href='{% url 'login' %}'>Logout</a>
             </div>
         </div>
+        <div style="z-index: 1;position: relative;width: 420px;left: 150px;">
+            <div style="z-index: 1;position: absolute;">
+                <select id="animal" onchange="selanimal(0)">
+                    <option disabled selected>Select Animal</option>
+                    <option value="all">All</option>
+                    {% for i in animals %}
+                    <option value={{ i }}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="aid" style="z-index: 1;position: absolute;right: 0;"></div>
+        </div>
         <li><a href='{% url 'login' %}'>Logout</a></li>
     </ul>
-    <select id="animal" onchange="selanimal(0)" style="z-index: 1;position: relative;">
-        <option value="all">All</option>
-        {% for i in animals %}
-        <option value={{ i }}>{{ i }}</option>
-        {% endfor %}
-    </select>
-    <div id="aid" style="z-index: 1;position: relative;"></div>
+    
 <div id="map"></div>
 
 <script>
@@ -241,8 +279,9 @@ li a:hover {
             animal=document.getElementById("animal").value
         }
         if (animal!="all")
-        {
+        {   
             document.getElementById("aid").innerHTML="<select id='animal_id' onchange='selid("+'"'+animal+'"'+")'>"
+                +"<option disabled selected>Select Animal ID</option>"
                 +"<option value='all'>All</option>"
                 +"</select>"
             for(var i in mdict[animal])
@@ -263,6 +302,11 @@ li a:hover {
             console.log(dict)
         }
         else{
+            if (document.getElementById("aid").innerHTML)
+            {
+                console.log("All")
+                document.getElementById("aid").innerHTML=""
+            }
             dict=mdict
             lat=mlat
             lon=mlon
