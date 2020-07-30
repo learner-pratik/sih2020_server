@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import JsonResponse
-from .models import Login,Tasks,Researcher,Forest_employee,Animal,Camera,Logs,Status
+from .models import *
 from .forms import addanimalform,addcameraform,addtaskform,addresearcherform
 from background_task import background
 import time
@@ -12,6 +12,7 @@ import pusher
 from tensorflow import keras
 import numpy as np
 import datetime
+import threading
 
 # Use a service account
 
@@ -61,7 +62,7 @@ def info(request):
                 request.session['flag']="r"
                 return redirect('researcher')
             else:
-                request.session['data']={'forest_name':data.forest_name}
+                request.session['data']={'area':data.area}
                 if data.role=='employee':
                     request.session['flag']="e"
                 else:
@@ -227,15 +228,33 @@ def assigntask(request):
         print(request.POST)
         task=Tasks.objects.get(task_id=request.POST['task_id'])
         Tasks.objects.filter(task_id=request.POST["task_id"]).update(status="assigned")
-        t=Tasks()
-        t.task_id=task.task_id
-        t.task_from=task.task_to
-        t.task_info=task.task_info
-        t.task_to=request.POST['task_to']
-        t.status='assigned'
-        t.deadline=task.deadline
+        t={}
+        t["task_id"]=task.task_id
+        t["task_from"]=task.task_to
+        t["task_info"]=task.task_info
+        t["task_to"]=request.POST['task_to']
+        t["status"]='assigned'
+        t["deadline"]=task.deadline.strftime('%Y-%m-%d')
         print(t)
-        t.save()
+        # t.save()
+        if not firebase_admin._apps:
+            data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+            jsonData = json.loads(data) #converts to a json structure
+
+            cred = credentials.Certificate(jsonData)
+            firebase_admin.initialize_app(cred)
+            db = firestore.client()
+        db = firestore.client()
+        doc_ref = db.collection(u'task').document(u'assign')
+        temp=doc_ref.get()
+        temp=temp.to_dict()
+        print(temp)
+        if request.POST['task_to'] in temp:
+            temp[request.POST['task_to']].append(t)
+        else:
+            temp[request.POST['task_to']]=[t]
+        print(temp)
+        doc_ref.set(temp)
     return HttpResponse(status=200)
 
 def addanimal(request):
@@ -434,6 +453,17 @@ def editresearcher(request,id="0"):
         resa+=","+ra[i]
     return render(request,"editresearcher.html",{"r":r,"animal":al,"resa":resa})
 
+def report(request):
+    return render(request,"report.html",{})
+
+def reportlist(request):
+    rep=Report.objects.all()
+    data=request.session.get('data')
+    print(data)
+    lrange=Division_range.objects.filter(division_id=data['area'])
+    return render(request,"reportlist.html",{"rep":rep})
+
+######BACK GROUND TASK########
 @background(schedule=2)
 def back():
     if not firebase_admin._apps:
@@ -454,6 +484,7 @@ def back():
     time={}
     c=Camera.objects.all()
     l=set(l)
+    
     for i in c:
         l.add(str(i.camera_id))
         lon[str(i.camera_id)]=i.longitude
@@ -463,18 +494,19 @@ def back():
     s=set(s)
     now = datetime.datetime.now()
     for i in temp:
-        time[str(i.camera_id)]=i.time
+        # time[str(i.camera_id)]=i.time
         s.add(str(i.camera_id))
     ans=l-s
     if (len(ans)!=0):
         xyz=list(ans)
+        print(time)
         for i in xyz:
             c = db.collection(u'camera').document('status')
             c.set({
                 u'camera_id': i,
                 u'latitude': lat[i],
                 u'longitude': lon[i],
-                u'time': time[i]
+                u'time': now
             })
 
             pusher_client = pusher.Pusher(
@@ -498,6 +530,80 @@ def back():
 def fun():
     print('call')
     return
+
+###############firestore##################
+callback_done = threading.Event()
+if not firebase_admin._apps:
+    data = open('main/static/serviceAccount.json').read() #opens the json file and saves the raw contents
+    jsonData = json.loads(data) #converts to a json structure
+
+    cred = credentials.Certificate(jsonData)
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+db = firestore.client()
+
+def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:    
+        dic=doc.to_dict()
+        if dic:
+            # print(dic)
+            r=Report()
+            r.empid=dic['empid']
+            res = bytes(dic['image'], 'utf-8')
+            r.image=res
+            r.description=dic['description']
+            r.latitude=dic['latitude']
+            r.longitude=dic['longitude']
+            r.save()
+            print(dic['description'])
+        # print(dic['image'])
+    callback_done.set()
+
+# Create a callback on_snapshot function to capture changes
+
+doc_ref = db.collection(u'report').document(u'animal_report')
+
+# Watch the document
+doc_watch = doc_ref.on_snapshot(on_snapshot)
+
+###TASK####
+callback_done_task = threading.Event()
+def on_snapshot_task(doc_snapshot, changes, read_time):
+    tid=''
+    for doc in doc_snapshot:    
+        dic=doc.to_dict()
+        if dic:
+            # print(dic)
+            t=Tasks.objects.filter(task_id=dic['task_id']).update(status='complete')
+            rep=Task_Description()
+            rep.task_id=dic['task_id']
+            tid=dic['task_id']
+            rep.description=dic['description']
+            res = bytes(dic['image'], 'utf-8') 
+            rep.image=res
+            rep.save()
+            # print(dic)
+        # print(dic['image'])
+            e = db.collection(u'task').document(u'assign')
+            di = e.get().to_dict()
+            # print(di,dic['empid'])
+            for i in range(len(di[dic['empid']])):
+                print(i)
+                if di[dic['empid']][i]['task_id']==tid:
+                    print(di[dic['empid']][i])
+                    del(di[dic['empid']][i])
+                    break
+            e.set(di)
+
+    callback_done_task.set()
+
+doc_ref_task = db.collection(u'task').document(u'complete')
+
+# Watch the document
+doc_watch_task = doc_ref_task.on_snapshot(on_snapshot_task)
+
+
+
 
 ###############API#################
 class give_task(APIView):

@@ -70,7 +70,7 @@ class Researcher(models.Model):
         return self.researcher_name
 
 class Forest_employee(models.Model):
-    forest_name = models.CharField(max_length=200)
+    area = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     empid = models.CharField(max_length=200)
     role = models.CharField(max_length=200)
@@ -78,3 +78,31 @@ class Forest_employee(models.Model):
     password = models.CharField(max_length=200)
     def __str__(self):
         return self.name
+
+class Report(models.Model):
+    empid = models.CharField(max_length=200)
+    description = models.CharField(max_length=1000)
+    image = models.BinaryField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    def __str__(self):
+        return self.empid
+
+class Task_Description(models.Model):
+    task_id = models.CharField(max_length=200)
+    description = models.CharField(max_length=1000)
+    image = models.BinaryField()
+    def __str__(self):
+        return self.task_id
+
+class Division_range(models.Model):
+    division_id = models.CharField(max_length=200)
+    range_id = models.CharField(max_length=200)
+    def __str__(self):
+        return self.division_id
+
+class Range_beat(models.Model):
+    range_id = models.CharField(max_length=200)
+    beat_id = models.CharField(max_length=200)
+    def __str__(self):
+        return self.range_id
